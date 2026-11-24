@@ -30,7 +30,12 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import kotlinx.coroutines.delay
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -106,15 +111,7 @@ fun PhishGuardScreen(vm: CheckViewModel) {
                         "(\"Check this link\"). Only the address is analysed — the page is never opened.",
                     color = Muted, fontSize = 13.sp,
                 )
-                UiState.Loading -> Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    CircularProgressIndicator(
-                        color = Ink, strokeWidth = 2.dp, modifier = Modifier.size(20.dp),
-                    )
-                    MonoLabel("INSPECTING…")
-                }
+                UiState.Loading -> LoadingIndicator()
                 is UiState.Success -> ResultCard(s.result) {
                     OutlinedButton(
                         onClick = vm::reset,
@@ -127,6 +124,26 @@ fun PhishGuardScreen(vm: CheckViewModel) {
                 }
                 is UiState.Error -> ErrorBox(s.message, onRetry = vm::check, onReset = vm::reset)
             }
+        }
+    }
+}
+
+/** Spinner; after 5 s explains that the hosted server may be waking up (up to ~60 s). */
+@Composable
+private fun LoadingIndicator() {
+    var slow by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { delay(5_000); slow = true }
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            CircularProgressIndicator(color = Ink, strokeWidth = 2.dp, modifier = Modifier.size(20.dp))
+            MonoLabel("INSPECTING…")
+        }
+        if (slow) {
+            Text("Waking up the server. The first check after a quiet spell can take up to a minute.",
+                color = Muted, fontSize = 13.sp)
         }
     }
 }

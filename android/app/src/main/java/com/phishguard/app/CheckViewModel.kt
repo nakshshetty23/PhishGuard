@@ -27,6 +27,15 @@ class CheckViewModel : ViewModel() {
 
     private var job: Job? = null
 
+    init {
+        // Wake the hosted backend as soon as the app opens, so it is likely awake
+        // by the time the user checks a link. Failures are ignored.
+        viewModelScope.launch {
+            try { ApiClient.api.health().close() } catch (e: CancellationException) { throw e }
+            catch (_: Exception) { }
+        }
+    }
+
     fun onInputChange(text: String) {
         _input.value = text
     }
@@ -52,10 +61,9 @@ class CheckViewModel : ViewModel() {
                     "Check the backend console for details.")
             } catch (e: IOException) {
                 UiState.Error("Can't reach the PhishGuard server at ${BuildConfig.BASE_URL}\n\n" +
-                    "• Start the backend: uvicorn app:app --app-dir backend --host 0.0.0.0 --port 8000\n" +
-                    "• Emulator uses 10.0.2.2; a physical device needs your PC's LAN IP " +
-                    "(set phishguard.baseUrl in gradle.properties).\n" +
-                    "• Phone and PC must be on the same Wi-Fi.")
+                    "• Check that this phone is online.\n" +
+                    "• The server sleeps when idle and can take up to a minute to wake. " +
+                    "Tap Retry in a moment.")
             } catch (e: Exception) {
                 UiState.Error("Unexpected error: ${e.message ?: e.javaClass.simpleName}")
             }

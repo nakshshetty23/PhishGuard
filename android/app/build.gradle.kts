@@ -4,9 +4,10 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
-// Emulator default; override with `phishguard.baseUrl=...` in gradle.properties.
+// Hosted HTTPS backend (Render) by default; works on emulator and real phones.
+// For a local backend, set `phishguard.baseUrl=http://10.0.2.2:8000/` in gradle.properties.
 val baseUrl: String = (project.findProperty("phishguard.baseUrl") as String?)
-    ?: "http://10.0.2.2:8000/"
+    ?: "https://phishguard-rp1z.onrender.com/"
 
 android {
     namespace = "com.phishguard.app"

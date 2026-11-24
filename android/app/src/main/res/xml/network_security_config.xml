@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Cleartext HTTP is allowed ONLY to the dev backend hosts below.
-     Physical device on Wi-Fi: add your PC's LAN IP, e.g.
-     <domain includeSubdomains="false">192.168.1.23</domain> -->
+<!-- The default backend is HTTPS (phishguard-rp1z.onrender.com), so no cleartext
+     is needed for it. Cleartext HTTP stays blocked everywhere else; the only
+     exception is a LOCAL dev backend (emulator host / loopback). To use a local
+     backend from a real phone, add your PC's LAN IP as another <domain>. -->
 <network-security-config>
     <base-config cleartextTrafficPermitted="false" />
     <domain-config cleartextTrafficPermitted="true">
