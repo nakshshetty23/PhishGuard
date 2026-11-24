@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhishGuard TEST PAGE</title>
+<style>
+  body { margin: 0; font-family: monospace; background: #F4F2EC; color: #1C1B19; }
+  .banner { background: #B23A2E; color: #fff; padding: 14px 16px; font-weight: bold;
+            letter-spacing: 1px; text-align: center; }
+  main { padding: 16px; }
+  pre { background: #fff; border: 1px solid #1C1B19; padding: 10px; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+  <div class="banner">TEST PAGE — not a real site</div>
+  <main>
+    <p>Developer fixture for the PhishGuard WebView camera/mic hook. It has no
+       branding, collects nothing, and never uploads or records anything.</p>
+    <p>On load it calls <code>navigator.mediaDevices.getUserMedia</code> once, with
+       no user interaction, so the app should raise
+       <b>"Requests camera on load"</b>. The app denies the request.</p>
+    <pre id="log">starting…</pre>
+  </main>
+<script>
+  var log = document.getElementById('log');
+  function say(m) { log.textContent += '\n' + m; }
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    say('navigator.mediaDevices.getUserMedia is not available here.');
+  } else {
+    say('calling getUserMedia({video:true}) on load…');
+    navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
+      say('RESULT: granted (the app should have denied this!)');
+      stream.getTracks().forEach(function (t) { t.stop(); });   // release immediately
+    }).catch(function (e) {
+      say('RESULT: ' + e.name + ' (denied, as expected)');
+    });
+  }
+</script>
+</body>
+</html>

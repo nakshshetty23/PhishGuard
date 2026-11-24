@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">PhishGuard</string>
+    <string name="share_label">Check this link</string>
+</resources>

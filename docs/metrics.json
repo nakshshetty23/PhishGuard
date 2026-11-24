@@ -1,0 +1,208 @@
+{
+  "n_train": 328995,
+  "n_test": 82249,
+  "test_positive_rate": 0.16157035343894757,
+  "roc_auc": 0.9628877540807523,
+  "pr_auc": 0.8816637901972695,
+  "operating_points": {
+    "conservative": {
+      "threshold": 0.867903940872351,
+      "precision": 0.9237175216522319,
+      "recall": 0.6260064715177966,
+      "f1": 0.7462659789190401,
+      "fpr": 0.0099622969837587,
+      "confusion": {
+        "tn": 68273,
+        "fp": 687,
+        "fn": 4970,
+        "tp": 8319
+      }
+    },
+    "balanced": {
+      "threshold": 0.7583057551398497,
+      "precision": 0.8267097201523431,
+      "recall": 0.7513733162766197,
+      "f1": 0.7872432688138132,
+      "fpr": 0.03035092807424594,
+      "confusion": {
+        "tn": 66867,
+        "fp": 2093,
+        "fn": 3304,
+        "tp": 9985
+      }
+    },
+    "sensitive": {
+      "threshold": 0.4453601576273457,
+      "precision": 0.6071265417999087,
+      "recall": 0.9000677251862442,
+      "f1": 0.7251288269172477,
+      "fpr": 0.11223897911832946,
+      "confusion": {
+        "tn": 61220,
+        "fp": 7740,
+        "fn": 1328,
+        "tp": 11961
+      }
+    }
+  },
+  "feature_importance_gain": [
+    {
+      "feature": "path_length",
+      "gain_share": 0.13902223330026636
+    },
+    {
+      "feature": "num_dots",
+      "gain_share": 0.09680472643999763
+    },
+    {
+      "feature": "num_hyphens",
+      "gain_share": 0.09594880437741553
+    },
+    {
+      "feature": "longest_token_len",
+      "gain_share": 0.09083904718375149
+    },
+    {
+      "feature": "num_slash",
+      "gain_share": 0.08807413812552721
+    },
+    {
+      "feature": "hostname_length",
+      "gain_share": 0.07439574859006842
+    },
+    {
+      "feature": "url_length",
+      "gain_share": 0.05954424544684037
+    },
+    {
+      "feature": "digit_ratio",
+      "gain_share": 0.05751952910882667
+    },
+    {
+      "feature": "num_digits",
+      "gain_share": 0.057268822486046235
+    },
+    {
+      "feature": "url_entropy",
+      "gain_share": 0.047720515279243154
+    },
+    {
+      "feature": "num_subdomains",
+      "gain_share": 0.04497711219078256
+    },
+    {
+      "feature": "num_underscore",
+      "gain_share": 0.04288394134385925
+    },
+    {
+      "feature": "num_equals",
+      "gain_share": 0.02781854791612969
+    },
+    {
+      "feature": "brand_not_in_domain",
+      "gain_share": 0.0195755776380123
+    },
+    {
+      "feature": "suspicious_tld",
+      "gain_share": 0.01692315037833807
+    },
+    {
+      "feature": "has_ip",
+      "gain_share": 0.013040501504614704
+    },
+    {
+      "feature": "num_query_params",
+      "gain_share": 0.008736255140141182
+    },
+    {
+      "feature": "num_question",
+      "gain_share": 0.0059326225357901365
+    },
+    {
+      "feature": "num_percent",
+      "gain_share": 0.0040771213692744526
+    },
+    {
+      "feature": "num_at",
+      "gain_share": 0.003095337631846654
+    },
+    {
+      "feature": "num_ampersand",
+      "gain_share": 0.0017910838513998171
+    },
+    {
+      "feature": "has_port",
+      "gain_share": 0.0015832240366474536
+    },
+    {
+      "feature": "has_punycode",
+      "gain_share": 0.0010887169477236467
+    },
+    {
+      "feature": "is_shortener",
+      "gain_share": 0.0008990324519680936
+    },
+    {
+      "feature": "double_slash_in_path",
+      "gain_share": 0.00035033918197369313
+    },
+    {
+      "feature": "brand_in_subdomain",
+      "gain_share": 8.962554351521439e-05
+    },
+    {
+      "feature": "no_https",
+      "gain_share": 0.0
+    }
+  ],
+  "shap_top12": [
+    {
+      "feature": "num_slash",
+      "mean_abs_shap": 0.5457058812660328
+    },
+    {
+      "feature": "path_length",
+      "mean_abs_shap": 0.5231597392661234
+    },
+    {
+      "feature": "num_dots",
+      "mean_abs_shap": 0.5044072746211556
+    },
+    {
+      "feature": "url_length",
+      "mean_abs_shap": 0.4133684352318036
+    },
+    {
+      "feature": "hostname_length",
+      "mean_abs_shap": 0.3988297108867298
+    },
+    {
+      "feature": "num_hyphens",
+      "mean_abs_shap": 0.3911024075121432
+    },
+    {
+      "feature": "num_subdomains",
+      "mean_abs_shap": 0.3255593592768168
+    },
+    {
+      "feature": "longest_token_len",
+      "mean_abs_shap": 0.321154263087977
+    },
+    {
+      "feature": "num_digits",
+      "mean_abs_shap": 0.2855106284048298
+    },
+    {
+      "feature": "num_underscore",
+      "mean_abs_shap": 0.2216425772782037
+    },
+    {
+      "feature": "url_entropy",
+      "mean_abs_shap": 0.19374904797140394
+    },
+    {
+      "feature": "num_equals",
+      "mean_abs_shap": 0.15734748915374167
+    }
+  ]
+}

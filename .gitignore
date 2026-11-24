@@ -1,0 +1,8 @@
+data/
+__pycache__/
+*.pyc
+.pytest_cache/
+.idea/
+*.log
+# user-submitted /report entries (runtime data)
+backend/reports.jsonl
