@@ -55,6 +55,7 @@ internal val Corner = RoundedCornerShape(2.dp)
 fun PhishGuardScreen(vm: CheckViewModel) {
     val state by vm.state.collectAsStateWithLifecycle()
     val input by vm.input.collectAsStateWithLifecycle()
+    val gate by vm.gate.collectAsStateWithLifecycle()
     val loading = state is UiState.Loading
     val keyboard = LocalSoftwareKeyboardController.current
     val focus = LocalFocusManager.current
@@ -112,18 +113,62 @@ fun PhishGuardScreen(vm: CheckViewModel) {
                     color = Muted, fontSize = 13.sp,
                 )
                 UiState.Loading -> LoadingIndicator()
-                is UiState.Success -> ResultCard(s.result) {
-                    OutlinedButton(
-                        onClick = vm::reset,
-                        modifier = Modifier.fillMaxWidth().padding(top = 6.dp),
-                        shape = Corner,
-                        border = BorderStroke(1.dp, Ink),
-                    ) {
-                        Text("Check another link", color = Ink, fontFamily = Mono)
-                    }
-                }
-                is UiState.Error -> ErrorBox(s.message, onRetry = vm::check, onReset = vm::reset)
+                is UiState.Success -> ResultCard(s.result) { GateActions(gate, vm) }
+                is UiState.Error -> ErrorBox(
+                    s.message, onRetry = vm::retry, onReset = vm::reset,
+                    gate = gate?.takeIf { it.status == Gate.Status.PENDING },
+                    onOpenAnyway = vm::openAnyway, onDontOpen = vm::dontOpen,
+                )
             }
+        }
+    }
+}
+
+@Composable
+private fun CheckAnotherButton(onClick: () -> Unit) {
+    OutlinedButton(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth().padding(top = 6.dp),
+        shape = Corner,
+        border = BorderStroke(1.dp, Ink),
+    ) { Text("Check another link", color = Ink, fontFamily = Mono) }
+}
+
+/** The explicit choice for a held link: "Don't open" is the safe default. */
+@Composable
+private fun OpenChoice(onDontOpen: () -> Unit, onOpenAnyway: () -> Unit) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Button(
+            onClick = onDontOpen, modifier = Modifier.weight(1f), shape = Corner,
+            colors = ButtonDefaults.buttonColors(containerColor = Ink, contentColor = Paper),
+            elevation = ButtonDefaults.buttonElevation(0.dp, 0.dp, 0.dp, 0.dp, 0.dp),
+        ) { Text("Don't open", fontFamily = Mono, fontWeight = FontWeight.Bold) }
+        OutlinedButton(
+            onClick = onOpenAnyway, modifier = Modifier.weight(1f), shape = Corner,
+            border = BorderStroke(1.dp, Danger),
+        ) { Text("Open anyway", color = Danger, fontFamily = Mono) }
+    }
+}
+
+/** Bottom of the result card: plain "check another", or the safety-gate state. */
+@Composable
+private fun GateActions(gate: Gate?, vm: CheckViewModel) {
+    when (gate?.status) {
+        null -> CheckAnotherButton(vm::reset)
+        Gate.Status.OPENING -> Text("Checked — safe. Opening in your browser…",
+            color = Safe, fontFamily = Mono, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+        Gate.Status.PENDING -> {
+            Text("This link has NOT been opened.", color = Ink,
+                fontWeight = FontWeight.Bold, fontSize = 14.sp)
+            OpenChoice(onDontOpen = vm::dontOpen, onOpenAnyway = vm::openAnyway)
+        }
+        Gate.Status.OPENED -> {
+            MonoLabel("OPENED IN YOUR BROWSER")
+            CheckAnotherButton(vm::reset)
+        }
+        Gate.Status.DECLINED -> {
+            MonoLabel("LINK NOT OPENED")
+            CheckAnotherButton(vm::reset)
         }
     }
 }
@@ -234,7 +279,10 @@ private fun FactorBar(f: Factor, color: Color) {
 }
 
 @Composable
-private fun ErrorBox(message: String, onRetry: () -> Unit, onReset: () -> Unit) {
+private fun ErrorBox(
+    message: String, onRetry: () -> Unit, onReset: () -> Unit,
+    gate: Gate? = null, onOpenAnyway: () -> Unit = {}, onDontOpen: () -> Unit = {},
+) {
     Column(
         Modifier.fillMaxWidth()
             .border(BorderStroke(1.dp, Danger), Corner)
@@ -251,9 +299,17 @@ private fun ErrorBox(message: String, onRetry: () -> Unit, onReset: () -> Unit) 
                 colors = ButtonDefaults.buttonColors(containerColor = Ink, contentColor = Paper),
                 elevation = ButtonDefaults.buttonElevation(0.dp, 0.dp, 0.dp, 0.dp, 0.dp),
             ) { Text("Retry", fontFamily = Mono) }
-            OutlinedButton(onClick = onReset, shape = Corner, border = BorderStroke(1.dp, Ink)) {
-                Text("Check another link", color = Ink, fontFamily = Mono)
+            if (gate == null) {
+                OutlinedButton(onClick = onReset, shape = Corner, border = BorderStroke(1.dp, Ink)) {
+                    Text("Check another link", color = Ink, fontFamily = Mono)
+                }
             }
+        }
+        if (gate != null) {
+            // Unverified link: never redirect silently; the user decides.
+            Text("This link could not be checked and has NOT been opened.",
+                fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Ink)
+            OpenChoice(onDontOpen = onDontOpen, onOpenAnyway = onOpenAnyway)
         }
     }
 }

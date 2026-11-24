@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,9 +33,19 @@ import androidx.compose.ui.unit.sp
 private enum class Tab { CHECK, BROWSE }
 
 @Composable
-fun AppRoot(checkVm: CheckViewModel, browseVm: BrowseViewModel) {
+fun AppRoot(
+    checkVm: CheckViewModel,
+    browseVm: BrowseViewModel,
+    onOpenExternal: (String) -> Unit,
+) {
     val context = LocalContext.current
     var tab by rememberSaveable { mutableStateOf(Tab.CHECK) }
+
+    // An incoming VIEW/SEND link always shows on the CHECK tab.
+    val incoming by checkVm.incoming.collectAsState()
+    LaunchedEffect(incoming) { if (incoming > 0) tab = Tab.CHECK }
+    // Safety-gate handoffs to the external browser.
+    LaunchedEffect(Unit) { checkVm.handoff.collect { onOpenExternal(it) } }
 
     // One WebView for the whole session so the page survives switching tabs. It is
     // created LAZILY the first time BROWSE opens: initialising Chromium on the main
